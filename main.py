@@ -4,6 +4,7 @@ from discord.ext import commands
 import logging
 from dotenv import load_dotenv
 import os
+from gemini import getResponse
 
 load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
@@ -20,6 +21,9 @@ async def on_ready():
     print("Bot starting...")
 
     await bot.change_presence(activity=discord.Game('eating rice.'), status=discord.Status.dnd)
+
+    req = getResponse("What model are you?")
+    print(req)
 
     try:
         print("Syncing commands...")
