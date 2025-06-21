@@ -1,3 +1,4 @@
+import random
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -47,10 +48,28 @@ async def on_message(message):
 async def test(interaction: discord.Interaction):
     await interaction.response.send_message(content="<:stare:1343032007277412424>")
 
+@bot.tree.command(name="ping", description="Check the bot's latency", guild=GUILD_ID)
+async def ping(interaction: discord.Interaction):
+    latency = round(bot.latency * 1000)
+    await interaction.response.send_message(f"Latency: {latency}ms")
+
+@bot.tree.command(name="guess", description="Guess the number between 1 and 100 inclusive", guild=GUILD_ID)
+async def guess(interaction: discord.Interaction, guess: int):
+    await interaction.response.send_message(f"Guess a number between 1 and 100 inclusive.\nYour guess: {guess}")
+    number = random.randint(1, 100)
+    if guess < 1 or guess > 100:
+        await interaction.followup.send("Number must be between 1 and 100.")
+        return
+    elif number == guess:
+        await interaction.followup.send(f"Correct! The number was {number}.")
+    else:
+        await interaction.followup.send(f"you suck. it was {number}. gamble again")
+
 @bot.tree.command(name="ask", description="ask gemini anything", guild=GUILD_ID)
 async def ask(interaction: discord.Interaction, *, message: str):
     await interaction.response.send_message("Thinking...")
-    req = getResponse(message)
+    req = getResponse(message + " (please limit response to 250 words)")
+    print(req)
     await interaction.followup.send(f"**Original question: {message}**")
     await interaction.followup.send(req)
 
