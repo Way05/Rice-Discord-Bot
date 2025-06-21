@@ -1,10 +1,10 @@
 import random
+import logging
+import os
+from dotenv import load_dotenv
 import discord
 from discord import app_commands
 from discord.ext import commands
-import logging
-from dotenv import load_dotenv
-import os
 from gemini import getResponse
 
 load_dotenv()
