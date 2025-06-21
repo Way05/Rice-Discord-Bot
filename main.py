@@ -69,7 +69,6 @@ async def guess(interaction: discord.Interaction, guess: int):
 async def ask(interaction: discord.Interaction, *, message: str):
     await interaction.response.send_message("Thinking...")
     req = getResponse(message + " (please limit response to 250 words)")
-    print(req)
     await interaction.followup.send(f"**Original question: {message}**")
     await interaction.followup.send(req)
 
