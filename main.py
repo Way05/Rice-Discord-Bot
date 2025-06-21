@@ -11,7 +11,7 @@ load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
 
 handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
-intents = discord.Intents.all()
+intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
@@ -51,7 +51,6 @@ async def test(ctx):
 async def ask(ctx, *, message):
     await ctx.send("Thinking...")
     req = getResponse(message)
-    # while(not req):
     await ctx.send(req)
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
