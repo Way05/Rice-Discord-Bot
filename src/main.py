@@ -11,6 +11,7 @@ load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
 
 GUILD_ID = discord.Object(id=1048428980128198677)
+BOT_ROLE = 1353587896497475678
 
 handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
 intents = discord.Intents.default()
@@ -34,13 +35,29 @@ async def on_ready():
 
     print("Setup Complete.")
 
+responses = [
+    "I love rice.",
+    "Rice is life.",
+    "Rice is the best food.",
+    "Rice is my favorite.",
+    "I can't live without rice.",
+    "Rice is the key to happiness.",
+    "Rice is the food of the gods.",
+    "Rice is the best thing ever.",
+    "go touch grass",
+    "<:stare:1343032007277412424>",
+    "<:look:1386023536300396594>",
+    "<:tweaking:1361430610387669134>"
+]
+
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
         return
     
-    if "rice" in message.content.lower():
-        await message.channel.send(f"{message.author.mention} <:stare:1343032007277412424>")
+    if f"<@&{BOT_ROLE}" in message.content or "rice" in message.content.lower():
+        random_response = random.choice(responses)
+        await message.channel.send(f"{message.author.mention} {random_response}")
 
     await bot.process_commands(message)
 
