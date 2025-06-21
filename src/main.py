@@ -53,6 +53,11 @@ async def ping(interaction: discord.Interaction):
     latency = round(bot.latency * 1000)
     await interaction.response.send_message(f"Latency: {latency}ms")
 
+@bot.tree.command(name="bonk", description="Bonk a user", guild=GUILD_ID)
+@app_commands.describe(user="The user to bonk")
+async def bonk(interaction: discord.Interaction, user: discord.Member):
+    await interaction.response.send_message(f"{interaction.user.mention} bonked {user.mention} <:look:1359337650649174049>")
+
 @bot.tree.command(name="guess", description="Guess the number between 1 and 100 inclusive", guild=GUILD_ID)
 @app_commands.rename(guess="number")
 async def guess(interaction: discord.Interaction, guess: int):
@@ -69,7 +74,7 @@ async def guess(interaction: discord.Interaction, guess: int):
 @bot.tree.command(name="ask", description="ask gemini anything", guild=GUILD_ID)
 async def ask(interaction: discord.Interaction, *, message: str):
     await interaction.response.send_message("Thinking...")
-    req = getResponse(message + " (please limit response to 250 words)")
+    req = getResponse(message + " (please limit response to 150 words max)")
     await interaction.followup.send(f"**Original question: {message}**")
     await interaction.followup.send(req)
 
