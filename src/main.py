@@ -56,7 +56,7 @@ async def ping(interaction: discord.Interaction):
 @bot.tree.command(name="bonk", description="Bonk a user", guild=GUILD_ID)
 @app_commands.describe(user="The user to bonk")
 async def bonk(interaction: discord.Interaction, user: discord.Member):
-    await interaction.response.send_message(f"{interaction.user.mention} bonked {user.mention} <:look:1359337650649174049>")
+    await interaction.response.send_message(f"{interaction.user.mention} bonked {user.mention} <:look:1386023536300396594>")
 
 @bot.tree.command(name="guess", description="Guess the number between 1 and 100 inclusive", guild=GUILD_ID)
 @app_commands.rename(guess="number")
