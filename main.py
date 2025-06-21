@@ -22,7 +22,7 @@ bot = commands.Bot(command_prefix="$", intents=intents)
 async def on_ready():
     print("Bot starting...")
 
-    await bot.change_presence(activity=discord.Game('eating rice.'), status=discord.Status.dnd)
+    await bot.change_presence(activity=discord.Game('with your rice.'), status=discord.Status.dnd)
 
     try:
         print("Syncing commands...")
