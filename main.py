@@ -47,12 +47,11 @@ async def on_message(message):
 async def test(interaction: discord.Interaction):
     await interaction.response.send_message(content="<:stare:1343032007277412424>")
 
-@bot.command(name="ask", description="ask gemini anything")
-async def ask(ctx, *, message):
-    loading = await ctx.send("Thinking...")
-    await ctx.defer()
+@bot.tree.command(name="ask", description="ask gemini anything", guild=GUILD_ID)
+async def ask(interaction: discord.Interaction, *, message: str):
+    await interaction.response.send_message("Thinking...")
     req = getResponse(message)
-    await loading.delete()
-    await ctx.send(req)
+    await interaction.followup.send(f"**Original question: {message}**")
+    await interaction.followup.send(req)
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
