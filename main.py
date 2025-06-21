@@ -12,7 +12,7 @@ token = os.getenv("DISCORD_TOKEN")
 GUILD_ID = discord.Object(id=1048428980128198677)
 
 handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
-intents = discord.Intents.all()
+intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 
@@ -38,7 +38,8 @@ async def on_message(message):
     if message.author == bot.user:
         return
     
-    if "rice" in message.content.lower():        await message.channel.send(f"{message.author.mention} <:stare:1343032007277412424>")
+    if "rice" in message.content.lower():
+        await message.channel.send(f"{message.author.mention} <:stare:1343032007277412424>")
 
     await bot.process_commands(message)
 
@@ -48,8 +49,8 @@ async def test(interaction: discord.Interaction):
 
 @bot.command(name="ask", description="ask gemini anything")
 async def ask(ctx, *, message):
-    await ctx.defer()
     loading = await ctx.send("Thinking...")
+    await ctx.defer()
     req = getResponse(message)
     await loading.delete()
     await ctx.send(req)
