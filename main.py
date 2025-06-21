@@ -1,3 +1,4 @@
+import time
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -22,9 +23,6 @@ async def on_ready():
 
     await bot.change_presence(activity=discord.Game('eating rice.'), status=discord.Status.dnd)
 
-    req = getResponse("What model are you?")
-    print(req)
-
     try:
         print("Syncing commands...")
         synced = await bot.tree.sync()
@@ -46,8 +44,14 @@ async def on_message(message):
     await bot.process_commands(message)
 
 @bot.hybrid_command()
-async def test(ctx: discord.Interaction):
-    await ctx.defer()   
-    await ctx.response.send_message("<:stare:1343032007277412424>", ephemeral=True)
+async def test(ctx):
+    await ctx.send("<:stare:1343032007277412424>")
+
+@bot.hybrid_command(name="ask", description="ask gemini anything")
+async def ask(ctx, *, message):
+    await ctx.send("Thinking...")
+    req = getResponse(message)
+    # while(not req):
+    await ctx.send(req)
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
