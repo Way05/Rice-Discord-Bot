@@ -49,8 +49,9 @@ async def test(ctx):
 
 @bot.hybrid_command(name="ask", description="ask gemini anything")
 async def ask(ctx, *, message):
-    await ctx.send("Thinking...")
+    loading = await ctx.send("Thinking...")
     req = getResponse(message)
+    await loading.delete()
     await ctx.send(req)
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
