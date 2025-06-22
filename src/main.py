@@ -10,8 +10,8 @@ from gemini import getResponse
 load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
 
-# GUILD_ID = discord.Object(id=1048428980128198677)
-GUILD_ID = None
+GUILD_ID = discord.Object(id=1048428980128198677)
+# GUILD_ID = None
 BOT_ROLE = 1353587896497475678
 
 handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
@@ -26,6 +26,8 @@ async def on_ready():
     print("Bot starting...")
 
     await bot.change_presence(activity=discord.Game('with your rice.'), status=discord.Status.dnd)
+
+    await bot.load_extension("stocks")
 
     try:
         print("Syncing commands...")
@@ -91,7 +93,7 @@ async def guess(interaction: discord.Interaction, guess: int):
 
 @bot.tree.command(name="ask", description="ask gemini anything", guild=GUILD_ID)
 async def ask(interaction: discord.Interaction, *, message: str):
-    await interaction.response.send_message("Thinking...")
+    await interaction.response.defer(thinking=True)
     req = getResponse(message + " (please limit response to 150 words max)")
     await interaction.followup.send(f"**Original question: {message}**")
     await interaction.followup.send(req)
