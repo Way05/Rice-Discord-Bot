@@ -9,6 +9,8 @@ logger = logging.getLogger('yfinance')
 logger.disabled = True
 logger.propagate = False
 
+GUILD_ID = discord.Object(id=1048428980128198677)
+
 def parseStockData(ticker):
     res = "You shouldnt be seeing this."
 
@@ -27,7 +29,7 @@ class Stocks(commands.Cog):
         self.bot = bot
 
     @app_commands.command(name="stock", description="Get stock information for a given ticker symbol.")
-    @app_commands.guilds(discord.Object(id=1048428980128198677))
+    # @app_commands.guilds(discord.Object(id=1048428980128198677))
     async def stock(self, interaction: discord.Interaction, ticker: str):
         await interaction.response.defer(thinking=True)
         response = parseStockData(ticker)
