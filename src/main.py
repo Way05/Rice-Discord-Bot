@@ -10,7 +10,8 @@ from gemini import getResponse
 load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
 
-GUILD_ID = discord.Object(id=1048428980128198677)
+# GUILD_ID = discord.Object(id=1048428980128198677)
+GUILD_ID = None
 BOT_ROLE = 1353587896497475678
 
 handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
