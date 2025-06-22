@@ -24,10 +24,19 @@ bot = commands.Bot(command_prefix="$", intents=intents)
 @bot.event
 async def on_ready():
     print("Bot starting...")
+    print(f"Logged in as: {bot.user.name}#{bot.user.discriminator}")
 
     await bot.change_presence(activity=discord.Game('with your rice.'), status=discord.Status.dnd)
 
-    await bot.load_extension("stocks")
+    print("Loading cogs...")
+    for cog in os.listdir("./src/cogs"):
+        if cog.endswith(".py"):
+            try:
+                await bot.load_extension(f"cogs.{cog[:-3]}")
+                # print(f"Loaded cog: {cog[:-3]}")
+            except Exception as e:
+                print(f"Failed to load cog {cog[:-3]}: {e}")
+    print("All cogs loaded.")
 
     try:
         print("Syncing commands...")
