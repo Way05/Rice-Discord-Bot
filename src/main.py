@@ -10,8 +10,8 @@ from gemini import getResponse
 load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
 
-# GUILD_ID = discord.Object(id=1048428980128198677)
-GUILD_ID = None
+GUILD_ID = discord.Object(id=1048428980128198677)
+GUILD_NONE = None
 BOT_ROLE = 1353587896497475678
 
 handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
@@ -41,6 +41,7 @@ async def on_ready():
     try:
         print("Syncing commands...")
         # bot.tree.clear_commands(guild=GUILD_ID)
+        # bot.tree.clear_commands(guild=GUILD_NONE)
         synced = await bot.tree.sync()
         print(f"Synced {len(synced)} commands.")
     except Exception as e:
