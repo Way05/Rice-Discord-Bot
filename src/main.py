@@ -64,49 +64,49 @@ responses = [
     "<:tweaking:1386075748741157055>"
 ]
 
-# @bot.event
-# async def on_message(message):
-#     if message.author == bot.user:
-#         return
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
     
-#     if f"<@&{BOT_ROLE}" in message.content or "rice" in message.content.lower():
-#         random_response = random.choice(responses)
-#         await message.channel.send(f"{message.author.mention} {random_response}")
+    if f"<@&{BOT_ROLE}" in message.content or "rice" in message.content.lower():
+        random_response = random.choice(responses)
+        await message.channel.send(f"{message.author.mention} {random_response}")
 
-#     await bot.process_commands(message)
+    await bot.process_commands(message)
 
-# @bot.tree.command(name="test")
-# async def test(interaction: discord.Interaction):
-#     await interaction.response.send_message(content="<:stare:1343032007277412424>")
+@bot.tree.command(name="test")
+async def test(interaction: discord.Interaction):
+    await interaction.response.send_message(content="<:stare:1343032007277412424>")
 
-# @bot.tree.command(name="ping", description="Check the bot's latency")
-# async def ping(interaction: discord.Interaction):
-#     latency = round(bot.latency * 1000)
-#     await interaction.response.send_message(f"Latency: {latency}ms")
+@bot.tree.command(name="ping", description="Check the bot's latency")
+async def ping(interaction: discord.Interaction):
+    latency = round(bot.latency * 1000)
+    await interaction.response.send_message(f"Latency: {latency}ms")
 
-# @bot.tree.command(name="bonk", description="Bonk a user")
-# @app_commands.describe(user="The user to bonk")
-# async def bonk(interaction: discord.Interaction, user: discord.Member):
-#     await interaction.response.send_message(f"{interaction.user.mention} bonked {user.mention} <:look:1386023536300396594>")
+@bot.tree.command(name="bonk", description="Bonk a user")
+@app_commands.describe(user="The user to bonk")
+async def bonk(interaction: discord.Interaction, user: discord.Member):
+    await interaction.response.send_message(f"{interaction.user.mention} bonked {user.mention} <:look:1386023536300396594>")
 
-# @bot.tree.command(name="guess", description="Guess the number between 1 and 100 inclusive")
-# @app_commands.rename(guess="number")
-# async def guess(interaction: discord.Interaction, guess: int):
-#     await interaction.response.send_message(f"Guess a number between 1 and 100 inclusive.\n{interaction.user.mention}'s guess: {guess}")
-#     number = random.randint(1, 100)
-#     if guess < 1 or guess > 100:
-#         await interaction.followup.send("Number must be between 1 and 100.")
-#         return
-#     elif number == guess:
-#         await interaction.followup.send(f"Correct! The number was {number}.")
-#     else:
-#         await interaction.followup.send(f"you suck. it was {number}. gamble again")
+@bot.tree.command(name="guess", description="Guess the number between 1 and 100 inclusive")
+@app_commands.rename(guess="number")
+async def guess(interaction: discord.Interaction, guess: int):
+    await interaction.response.send_message(f"Guess a number between 1 and 100 inclusive.\n{interaction.user.mention}'s guess: {guess}")
+    number = random.randint(1, 100)
+    if guess < 1 or guess > 100:
+        await interaction.followup.send("Number must be between 1 and 100.")
+        return
+    elif number == guess:
+        await interaction.followup.send(f"Correct! The number was {number}.")
+    else:
+        await interaction.followup.send(f"you suck. it was {number}. gamble again")
 
-# @bot.tree.command(name="ask", description="ask gemini anything")
-# async def ask(interaction: discord.Interaction, *, message: str):
-#     await interaction.response.defer(thinking=True)
-#     req = getResponse(message + " (please limit response to 150 words max)")
-#     await interaction.followup.send(f"**Original question: {message}**")
-#     await interaction.followup.send(req)
+@bot.tree.command(name="ask", description="ask gemini anything")
+async def ask(interaction: discord.Interaction, *, message: str):
+    await interaction.response.defer(thinking=True)
+    req = getResponse(message + " (please limit response to 150 words max)")
+    await interaction.followup.send(f"**Original question: {message}**")
+    await interaction.followup.send(req)
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
