@@ -1,10 +1,12 @@
 import random
 import logging
 import os
+import asyncio
 from dotenv import load_dotenv
 import discord
 from discord import app_commands
 from discord.ext import commands
+import aiosqlite
 from gemini import getResponse
 
 load_dotenv()
@@ -96,7 +98,6 @@ async def guess(interaction: discord.Interaction, guess: int):
     number = random.randint(1, 100)
     if guess < 1 or guess > 100:
         await interaction.followup.send("Number must be between 1 and 100.")
-        return
     elif number == guess:
         await interaction.followup.send(f"Correct! The number was {number}.")
     else:
@@ -109,4 +110,31 @@ async def ask(interaction: discord.Interaction, *, message: str):
     await interaction.followup.send(f"**Original question: {message}**")
     await interaction.followup.send(req)
 
+@bot.tree.command(name="gamble", description="Gamble with your rice")
+async def gamble(interaction: discord.Interaction, amount: int):
+    cursor = await bot.db.cursor()
+    await cursor.execute("SELECT rice FROM users WHERE user_id = ?", (interaction.user.id,))
+    res = await cursor.fetchone()
+    if res is None:
+        await interaction.response.send_message("Please register your user using ```/register``` before gambling.")
+    money = res[0]
+    
+    if amount > money:
+        await interaction.response.send_message(f"You don't have enough rice to gamble {amount} rice.")
+    else:
+        roll = random.randint(1, 10)
+        if roll == 1:
+            ratio = amount / money
+            win = round(money * ratio * 2) * random.randint(1, 5)
+            money += win
+            await interaction.response.send_message(f"You gambled {amount} rice and won {win} rice! You now have {money} rice.")
+        else:
+            money -= amount
+            await interaction.response.send_message(f"You lost {amount} rice. You now have {money} rice left.")
+
+        await cursor.execute("UPDATE users SET rice = ? WHERE user_id = ?", (money, interaction.user.id))
+
+    await cursor.close()
+
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
+asyncio.run(bot.db.close())
