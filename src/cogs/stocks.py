@@ -1,5 +1,4 @@
 import yfinance as yf
-import requests.exceptions
 import discord
 from discord import app_commands
 from discord.ext import commands
