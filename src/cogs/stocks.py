@@ -14,7 +14,7 @@ def parseStockData(ticker):
     res = "You shouldnt be seeing this."
 
     data = yf.Ticker(ticker)
-    if not "regularMarketPrice" in data.info and not "currency" in data.info:
+    if "regularMarketPrice" not in data.info and "currency" not in data.info:
         res = f"{ticker.upper()} not found or no data available."
     else:
         price = data.info["regularMarketPrice"]
