@@ -2,4 +2,4 @@
 
 Custom discord bot for our server.
 
-Built with Discord.py. Uses Gemini API, yfinance
+Built with Discord.py. Uses Gemini API, aioSQLite, yfinance
