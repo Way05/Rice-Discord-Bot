@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 import discord
 from discord import app_commands
 from discord.ext import commands
-import aiosqlite
 from gemini import getResponse
 
 load_dotenv()
@@ -133,6 +132,7 @@ async def gamble(interaction: discord.Interaction, amount: int):
             await interaction.response.send_message(f"You lost {amount} rice. You now have {money} rice left.")
 
         await cursor.execute("UPDATE users SET rice = ? WHERE user_id = ?", (money, interaction.user.id))
+        await bot.db.commit()
 
     await cursor.close()
 
