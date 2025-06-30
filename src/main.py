@@ -94,11 +94,17 @@ async def bonk(interaction: discord.Interaction, user: discord.Member):
     if res is None:
         await interaction.response.send_message(f"{interaction.user.mention} bonked {user.mention} <:look:1386023536300396594>")
     
-    await cursor.execute("UPDATE users SET rice = rice - 100 WHERE user_id = ?", (user.id,))
-    await cursor.execute("UPDATE users SET rice = rice + 100 WHERE user_id = ?", (interaction.user.id,))
+    riceToSteal = 100
+    if res[0] < riceToSteal:
+        riceToSteal = res[0]
+    elif res[0] == 0:
+        await interaction.response.send_message(f"{interaction.user.mention} bonked {user.mention}, but they had no rice to steal <:look:1386023536300396594>")
+
+    await cursor.execute(f"UPDATE users SET rice = rice - {riceToSteal} WHERE user_id = ?", (user.id,))
+    await cursor.execute(f"UPDATE users SET rice = rice + {riceToSteal} WHERE user_id = ?", (interaction.user.id,))
     await bot.db.commit()
     await cursor.close()
-    await interaction.response.send_message(f"{interaction.user.mention} bonked {user.mention} and stole 100 of their rice. <:look:1386023536300396594>")
+    await interaction.response.send_message(f"{interaction.user.mention} bonked {user.mention} and stole {riceToSteal} of their rice. <:look:1386023536300396594>")
     
 @bot.tree.command(name="guess", description="Guess the number between 1 and 100 inclusive")
 @app_commands.rename(guess="number")
