@@ -88,8 +88,18 @@ async def ping(interaction: discord.Interaction):
 @bot.tree.command(name="bonk", description="Bonk a user")
 @app_commands.describe(user="The user to bonk")
 async def bonk(interaction: discord.Interaction, user: discord.Member):
-    await interaction.response.send_message(f"{interaction.user.mention} bonked {user.mention} <:look:1386023536300396594>")
-
+    cursor = await bot.db.cursor()
+    await cursor.execute("SELECT rice FROM users WHERE user_id = ?", (user.id,))
+    res = await cursor.fetchone()
+    if res is None:
+        await interaction.response.send_message(f"{interaction.user.mention} bonked {user.mention} <:look:1386023536300396594>")
+    
+    await cursor.execute("UPDATE users SET rice = rice - 100 WHERE user_id = ?", (user.id,))
+    await cursor.execute("UPDATE users SET rice = rice + 100 WHERE user_id = ?", (interaction.user.id,))
+    await bot.db.commit()
+    await cursor.close()
+    await interaction.response.send_message(f"{interaction.user.mention} bonked {user.mention} and stole 100 of their rice. <:look:1386023536300396594>")
+    
 @bot.tree.command(name="guess", description="Guess the number between 1 and 100 inclusive")
 @app_commands.rename(guess="number")
 async def guess(interaction: discord.Interaction, guess: int):
@@ -98,6 +108,13 @@ async def guess(interaction: discord.Interaction, guess: int):
     if guess < 1 or guess > 100:
         await interaction.followup.send("Number must be between 1 and 100.")
     elif number == guess:
+        cursor = await bot.db.cursor()
+        await cursor.execute("SELECT rice FROM users WHERE user_id = ?", (interaction.user.id,))
+        res = await cursor.fetchone()
+        if res is not None:
+            await cursor.execute("UPDATE users SET rice = rice + 10000 WHERE user_id = ?", (interaction.user.id,))
+            await bot.db.commit()
+            await cursor.close()
         await interaction.followup.send(f"Correct! The number was {number}.")
     else:
         await interaction.followup.send(f"you suck. it was {number}. gamble again")
