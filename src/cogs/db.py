@@ -31,6 +31,19 @@ class DB(commands.Cog):
             rice_amount = res[0]
             await interaction.response.send_message(f"{interaction.user.mention}, you have {rice_amount} rice.")
 
+    @app_commands.command(name="leaderboard", description="Check the rice leaderboard")
+    async def leaderboard(self, interaction: discord.Interaction):
+        await interaction.response.defer(thinking=True)
+        cursor = await self.bot.db.cursor()
+        await cursor.execute("SELECT user_id, rice FROM users ORDER BY rice DESC LIMIT 5")
+        res = await cursor.fetchall()
+        if res is None:
+            await interaction.response.send_message("No users found in the database.")
+
+        await cursor.close()
+        formatStr = "".join([f"{self.bot.get_user(data[0]).display_name}: {data[1]} rice\n" for data in res])
+        await interaction.followup.send(f"**Rice Leaderboard:**\n{formatStr}")
+
 async def setup(bot):
     await bot.add_cog(DB(bot))
 
