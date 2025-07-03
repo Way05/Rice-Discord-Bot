@@ -143,6 +143,8 @@ async def gamble(interaction: discord.Interaction, amount: int):
     
     if amount > money:
         await interaction.response.send_message(f"You don't have enough rice to gamble {amount} rice.")
+    elif amount <= 0:
+        await interaction.response.send_message(f"You cannot gamble {amount} rice.")
     else:
         roll = random.randint(1, 10)
         if roll == 1:
