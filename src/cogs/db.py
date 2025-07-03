@@ -15,6 +15,7 @@ class DB(commands.Cog):
         res = await cursor.fetchone()
         if res is not None:
             await interaction.response.send_message(f"{interaction.user.mention} is already registered in the database.")
+            return
 
         await cursor.execute("INSERT INTO users(user_id) VALUES(?)", (interaction.user.id,))
         await self.bot.db.commit()
