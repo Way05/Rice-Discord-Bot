@@ -22,7 +22,7 @@ class DB(commands.Cog):
         await interaction.response.send_message(f"{interaction.user.mention} has been registered in the database.")
 
     @app_commands.command(name="rice", description="Check your rice balance")
-    async def rice(self, interaction: discord.Interaction):
+    async def getRice(self, interaction: discord.Interaction):
         cursor = await self.bot.db.cursor()
         await cursor.execute("SELECT rice FROM users WHERE user_id = ?", (interaction.user.id,))
         res = await cursor.fetchone()
@@ -32,8 +32,10 @@ class DB(commands.Cog):
             rice_amount = res[0]
             await interaction.response.send_message(f"{interaction.user.mention}, you have {rice_amount} rice.")
 
-    @app_commands.command(name="leaderboard", description="Check the rice leaderboard")
-    async def leaderboard(self, interaction: discord.Interaction):
+    lb_group = app_commands.Group(name="leaderboard", description="top 5 leaderboards")  
+
+    @lb_group.command(name="rice", description="Check the rice leaderboard")
+    async def rice(self, interaction: discord.Interaction):
         await interaction.response.defer(thinking=True)
         cursor = await self.bot.db.cursor()
         await cursor.execute("SELECT user_id, rice FROM users ORDER BY rice DESC LIMIT 5")
@@ -45,13 +47,26 @@ class DB(commands.Cog):
         formatStr = "".join([f"{self.bot.get_user(data[0]).display_name}: {data[1]} rice\n" for data in res])
         await interaction.followup.send(f"**Rice Leaderboard:**\n{formatStr}")
 
+    @lb_group.command(name="level", description="Check the level leaderboard")
+    async def level(self, interaction: discord.Interaction):
+        await interaction.response.defer(thinking=True)
+        cursor = await self.bot.db.cursor()
+        await cursor.execute("SELECT user_id, level FROM users ORDER BY level DESC LIMIT 5")
+        res = await cursor.fetchall()
+        if res is None:
+            await interaction.response.send_message("No users found in the database.")
+
+        await cursor.close()
+        formatStr = "".join([f"{self.bot.get_user(data[0]).display_name}: level {data[1]}\n" for data in res])
+        await interaction.followup.send(f"**Levels Leaderboard:**\n{formatStr}")
+
 async def setup(bot):
     await bot.add_cog(DB(bot))
 
     print("Loading database...")
     bot.db = await aiosqlite.connect("main.db")
     cursor = await bot.db.cursor()
-    await cursor.execute("CREATE TABLE IF NOT EXISTS users(user_id INTEGER, rice INTEGER DEFAULT 5000)")
+    await cursor.execute("CREATE TABLE IF NOT EXISTS users(user_id INTEGER PRIMARY KEY, rice INTEGER DEFAULT 5000, level INTEGER DEFAULT 0, xp INTEGER DEFAULT 0)")
     await bot.db.commit()
     await cursor.close()
     print("Database loaded.")
