@@ -125,7 +125,21 @@ async def filter_error(interaction: discord.Interaction, error):
 @bot.tree.command(name="daily", description="Claim your daily rations")
 @app_commands.checks.cooldown(1, 86400, key=lambda i: (i.guild_id, i.user.id))
 async def daily(interaction: discord.Interaction):
-    pass
+    cursor = await bot.db.cursor()
+    await cursor.execute("SELECT EXISTS(SELECT 1 FROM users WHERE user_id = ?)", (interaction.user.id,))
+    res = await cursor.fetchone()
+    if res[0] == 0:
+        await interaction.response.send_message("Please register your user using ```/register``` first.")
+    else:
+        await cursor.execute("UPDATE users SET rice = rice + 2500 WHERE user_id = ?", (interaction.user.id,))
+        await bot.db.commit()
+        await interaction.response.send_message(f"{interaction.user.mention} claimed their daily 2500 rice!")
+    await cursor.close()
+
+@daily.error
+async def daily_error(interaction: discord.Interaction, error):
+    if isinstance(error, app_commands.CommandOnCooldown):
+        await interaction.response.send_message(f"You can only claim your daily rations once every 24 hours. Try again in {error.retry_after:.0f} seconds.", ephemeral=True)
 
 @bot.tree.command(name="bonk", description="Bonk a user")
 @app_commands.describe(user="The user to bonk")
