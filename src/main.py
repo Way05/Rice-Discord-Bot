@@ -1,13 +1,11 @@
-import random
-import logging
-import os
-import asyncio
-from typing import Literal
-from dotenv import load_dotenv
 import discord
 from discord import app_commands
 from discord.ext import commands
-from gemini import getResponse
+from dotenv import load_dotenv
+import os
+import logging
+import asyncio
+import random
 
 load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
@@ -67,6 +65,15 @@ responses = [
     "<:tweaking:1386075748741157055>"
 ]
 
+filter_enabled = False
+censored = os.getenv("CENSORED").split(",")
+
+def is_guild_owner():
+    async def predicate(interaction: discord.Interaction):
+        return interaction.user.id == interaction.guild.owner_id
+    
+    return app_commands.check(predicate)
+
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
@@ -76,7 +83,22 @@ async def on_message(message):
         random_response = random.choice(responses)
         await message.channel.send(f"{message.author.mention} {random_response}")
 
+    # if filter_enabled and any(word in message.content.lower() for word in censored):
+        # message.delete()
+        # await message.channel.send(f"{message.author.mention} yu can not say that <:stare:1343032007277412424>")
+    if filter_enabled:
+        await message.delete()
+        for word in censored:
+            if word in message.content.lower():
+                await message.channel.send(f"{message.author.mention} yu cannot say {word} <:stare:1343032007277412424>")
+                break
+
     await bot.process_commands(message)
+
+# @bot.event
+# async def on_command_error(ctx, error):
+#     if isinstance(error, commands.CheckFailure):
+#         await ctx.send("You do not have permission to use this command.")
 
 @bot.tree.command(name="test")
 async def test(interaction: discord.Interaction):
@@ -86,6 +108,24 @@ async def test(interaction: discord.Interaction):
 async def ping(interaction: discord.Interaction):
     latency = round(bot.latency * 1000)
     await interaction.response.send_message(f"Latency: {latency}ms")
+
+@bot.tree.command(name="filter", description="Toggle the filter on or off")
+@is_guild_owner()
+async def filter(interaction: discord.Interaction):
+    global filter_enabled
+    filter_enabled = not filter_enabled
+    status = "enabled" if filter_enabled else "disabled"
+    await interaction.response.send_message(f"brainrot filter is now {status}")
+
+@filter.error
+async def filter_error(interaction: discord.Interaction, error):
+    if isinstance(error, app_commands.CheckFailure):
+        await interaction.response.send_message("You do not have permission to use this command.", ephemeral=True)
+
+@bot.tree.command(name="daily", description="Claim your daily rations")
+@app_commands.checks.cooldown(1, 86400, key=lambda i: (i.guild_id, i.user.id))
+async def daily(interaction: discord.Interaction):
+    pass
 
 @bot.tree.command(name="bonk", description="Bonk a user")
 @app_commands.describe(user="The user to bonk")
@@ -107,52 +147,6 @@ async def bonk(interaction: discord.Interaction, user: discord.Member):
     await bot.db.commit()
     await cursor.close()
     await interaction.response.send_message(f"{interaction.user.mention} bonked {user.mention} and stole {riceToSteal} of their rice. <:look:1386023536300396594>")
-    
-@bot.tree.command(name="guess", description="Guess the number between 1 and 100 inclusive")
-@app_commands.rename(guess="number")
-async def guess(interaction: discord.Interaction, guess: int):
-    await interaction.response.send_message(f"Guess a number between 1 and 100 inclusive.\n{interaction.user.mention}'s guess: {guess}")
-    number = random.randint(1, 100)
-    if guess < 1 or guess > 100:
-        await interaction.followup.send("Number must be between 1 and 100.")
-    elif number == guess:
-        cursor = await bot.db.cursor()
-        await cursor.execute("SELECT rice FROM users WHERE user_id = ?", (interaction.user.id,))
-        res = await cursor.fetchone()
-        if res is not None:
-            await cursor.execute("UPDATE users SET rice = rice + 10000 WHERE user_id = ?", (interaction.user.id,))
-            await bot.db.commit()
-            await cursor.close()
-        await interaction.followup.send(f"Correct! The number was {number}.")
-    else:
-        await interaction.followup.send(f"you suck. it was {number}. gamble again")
-
-@bot.tree.command(name="rps", description="Play rock paper scissors")
-@app_commands.describe(choice="Your choice: rock, paper, or scissors")
-async def rps(interaction: discord.Interaction, choice: Literal["rock", "paper", "scissors"]):
-    choices = ["rock", "paper", "scissors"]
-    bot_choice = random.choice(choices)
-
-    if choice == bot_choice:
-        await interaction.response.send_message(f"tie <:stare:1343032007277412424>\nboth chose {choice}.")
-    elif (choice == "rock" and bot_choice == "scissors") or (choice == "paper" and bot_choice == "rock") or (choice == "scissors" and bot_choice == "paper"):
-        await interaction.response.send_message(f"cheater <:tweaking:1386075748741157055>\nYou chose {choice}, I chose {bot_choice}.\n(+500 rice)")
-        cursor = await bot.db.cursor()
-        await cursor.execute("SELECT rice FROM users WHERE user_id = ?", (interaction.user.id,))
-        res = await cursor.fetchone()
-        if res is not None:
-            await cursor.execute("UPDATE users SET rice = rice + 500 WHERE user_id = ?", (interaction.user.id,))
-            await bot.db.commit()
-        await cursor.close()
-    else:
-        await interaction.response.send_message(f"skill issue <:lol:1371285955406991511>\nYou chose {choice}, I chose {bot_choice}.")
-
-@bot.tree.command(name="ask", description="ask gemini anything")
-async def ask(interaction: discord.Interaction, *, message: str):
-    await interaction.response.defer(thinking=True)
-    req = getResponse(message + " (please limit response to 150 words max)")
-    await interaction.followup.send(f"**Original question: {message}**")
-    await interaction.followup.send(req)
 
 @bot.tree.command(name="gamble", description="Gamble with your rice")
 async def gamble(interaction: discord.Interaction, amount: int):
