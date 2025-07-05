@@ -2,6 +2,7 @@ import random
 import logging
 import os
 import asyncio
+from typing import Literal
 from dotenv import load_dotenv
 import discord
 from discord import app_commands
@@ -124,6 +125,26 @@ async def guess(interaction: discord.Interaction, guess: int):
         await interaction.followup.send(f"Correct! The number was {number}.")
     else:
         await interaction.followup.send(f"you suck. it was {number}. gamble again")
+
+@bot.tree.command(name="rps", description="Play rock paper scissors")
+@app_commands.describe(choice="Your choice: rock, paper, or scissors")
+async def rps(interaction: discord.Interaction, choice: Literal["rock", "paper", "scissors"]):
+    choices = ["rock", "paper", "scissors"]
+    bot_choice = random.choice(choices)
+
+    if choice == bot_choice:
+        await interaction.response.send_message(f"tie <:stare:1343032007277412424>\nboth chose {choice}.")
+    elif (choice == "rock" and bot_choice == "scissors") or (choice == "paper" and bot_choice == "rock") or (choice == "scissors" and bot_choice == "paper"):
+        await interaction.response.send_message(f"cheater <:tweaking:1386075748741157055>\nYou chose {choice}, I chose {bot_choice}.\n(+500 rice)")
+        cursor = await bot.db.cursor()
+        await cursor.execute("SELECT rice FROM users WHERE user_id = ?", (interaction.user.id,))
+        res = await cursor.fetchone()
+        if res is not None:
+            await cursor.execute("UPDATE users SET rice = rice + 500 WHERE user_id = ?", (interaction.user.id,))
+            await bot.db.commit()
+        await cursor.close()
+    else:
+        await interaction.response.send_message(f"skill issue <:lol:1371285955406991511>\nYou chose {choice}, I chose {bot_choice}.")
 
 @bot.tree.command(name="ask", description="ask gemini anything")
 async def ask(interaction: discord.Interaction, *, message: str):
