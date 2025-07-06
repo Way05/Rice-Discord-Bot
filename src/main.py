@@ -91,14 +91,9 @@ async def on_message(message):
         for word in censored:
             if word in message.content.lower():
                 await message.channel.send(f"{message.author.mention} yu cannot say {word} <:stare:1343032007277412424>")
-                break
+                return
 
     await bot.process_commands(message)
-
-# @bot.event
-# async def on_command_error(ctx, error):
-#     if isinstance(error, commands.CheckFailure):
-#         await ctx.send("You do not have permission to use this command.")
 
 @bot.tree.command(name="test")
 async def test(interaction: discord.Interaction):
