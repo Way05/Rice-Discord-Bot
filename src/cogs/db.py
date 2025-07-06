@@ -32,6 +32,17 @@ class DB(commands.Cog):
             rice_amount = res[0]
             await interaction.response.send_message(f"{interaction.user.mention}, you have {rice_amount} rice.")
 
+    @app_commands.command(name="level", description="Check your level")
+    async def getLevel(self, interaction: discord.Interaction):
+        cursor = await self.bot.db.cursor()
+        await cursor.execute("SELECT level FROM users WHERE user_id = ?", (interaction.user.id,))
+        res = await cursor.fetchone()
+        if res is None:
+            await interaction.response.send_message("Please register your user using ```/register``` before checking your level.")
+        else:
+            level = res[0]
+            await interaction.response.send_message(f"{interaction.user.mention}, you are level {level}")
+
     lb_group = app_commands.Group(name="leaderboard", description="top 5 leaderboards")  
 
     @lb_group.command(name="rice", description="Check the rice leaderboard")
