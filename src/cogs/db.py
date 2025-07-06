@@ -57,8 +57,8 @@ class DB(commands.Cog):
             await interaction.response.send_message("No users found in the database.")
 
         await cursor.close()
-        formatStr = "".join([f"{self.bot.get_user(data[0]).display_name}: level {data[1]}\n" for data in res])
-        await interaction.followup.send(f"**Levels Leaderboard:**\n{formatStr}")
+        formatStr = "".join([f"{self.bot.get_user(data[0]).display_name}: {data[1]}\n" for data in res])
+        await interaction.followup.send(f"**Levels Leaderboard: (5 min refresh)**\n{formatStr}")
 
 async def setup(bot):
     await bot.add_cog(DB(bot))
