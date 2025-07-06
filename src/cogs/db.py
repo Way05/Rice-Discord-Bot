@@ -2,6 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 import aiosqlite
+from .levels import getXPToNextLevel
 
 class DB(commands.Cog):
     def __init__(self, bot):
@@ -35,13 +36,14 @@ class DB(commands.Cog):
     @app_commands.command(name="level", description="Check your level")
     async def getLevel(self, interaction: discord.Interaction):
         cursor = await self.bot.db.cursor()
-        await cursor.execute("SELECT level FROM users WHERE user_id = ?", (interaction.user.id,))
+        await cursor.execute("SELECT level, xp FROM users WHERE user_id = ?", (interaction.user.id,))
         res = await cursor.fetchone()
         if res is None:
             await interaction.response.send_message("Please register your user using ```/register``` before checking your level.")
         else:
             level = res[0]
-            await interaction.response.send_message(f"{interaction.user.mention}, you are level {level}")
+            xp = res[1]
+            await interaction.response.send_message(f"{interaction.user.mention}, you are level {level} [{getXPToNextLevel(level) - xp} XP to next level]")
 
     lb_group = app_commands.Group(name="leaderboard", description="top 5 leaderboards")  
 
