@@ -102,7 +102,7 @@ async def test(interaction: discord.Interaction):
 @bot.tree.command(name="ping", description="Check the bot's latency")
 async def ping(interaction: discord.Interaction):
     latency = round(bot.latency * 1000)
-    await interaction.response.send_message(f"Latency: {latency}ms")
+    await interaction.response.send_message(f"Latency: ```{latency}ms```")
 
 @bot.tree.command(name="filter", description="Toggle the filter on or off")
 @is_guild_owner()
@@ -173,9 +173,8 @@ async def gamble(interaction: discord.Interaction, amount: int):
     else:
         roll = random.randint(1, 10)
         if roll == 1:
-            ratio = amount / money
-            win = round(money * ratio * 2) * random.randint(1, 5)
-            money += win
+            win = money * 1.5 * random.randint(1, 5)
+            money = win
             await interaction.response.send_message(f"You gambled {amount} rice and won {win} rice! You now have {money} rice.")
         else:
             money -= amount
