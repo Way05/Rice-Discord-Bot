@@ -62,7 +62,8 @@ responses = [
     "go touch grass",
     "<:stare:1343032007277412424>",
     "<:look:1386023536300396594>",
-    "<:tweaking:1386075748741157055>"
+    "<:tweaking:1386075748741157055>",
+    "<:rice_spin:1391523995916046490>"
 ]
 
 filter_enabled = False
