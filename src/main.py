@@ -173,12 +173,12 @@ async def gamble(interaction: discord.Interaction, amount: int):
         await interaction.response.send_message(f"You cannot gamble {amount} rice.")
     else:
         roll = random.randint(1, 10)
+        money -= amount
         if roll == 1:
-            win = money * 1.5 * random.randint(1, 5)
-            money = win
+            win = amount * 1.5 * random.randint(1, 5)
+            money += round(win)
             await interaction.response.send_message(f"You gambled {amount} rice and won {win} rice! You now have {money} rice.")
         else:
-            money -= amount
             await interaction.response.send_message(f"You lost {amount} rice. You now have {money} rice left.")
 
         await cursor.execute("UPDATE users SET rice = ? WHERE user_id = ?", (money, interaction.user.id))
