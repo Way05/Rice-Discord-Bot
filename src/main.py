@@ -193,10 +193,15 @@ async def donate(interaction: discord.Interaction, user: discord.Member, amount:
     res = await cursor.fetchone()
     if res is None:
         await interaction.response.send_message(f"{user.name} is not registered in the DB")
+        return
+    if amount > res[0]:
+        await interaction.response.send_message("you do not have enough rice to donate")
+        return
     await cursor.execute("SELECT rice FROM users WHERE user_id = ?", (interaction.user.id,))
     res = await cursor.fetchone()
     if res is None:
         await interaction.response.send_message(f"{interaction.user.mention} is not registered in the DB")
+        return
 
     await cursor.execute(f"UPDATE users SET rice = rice - {amount} WHERE user_id = ?", (interaction.user.id,))
     await cursor.execute(f"UPDATE users SET rice = rice + {amount} WHERE user_id = ?", (user.id,))
