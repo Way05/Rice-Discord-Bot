@@ -103,7 +103,7 @@ async def test(interaction: discord.Interaction):
 @bot.tree.command(name="ping", description="Check the bot's latency")
 async def ping(interaction: discord.Interaction):
     latency = round(bot.latency * 1000)
-    await interaction.response.send_message(f"Latency: ```{latency}ms```")
+    await interaction.response.send_message(f"Latency: `{latency}ms`")
 
 @bot.tree.command(name="filter", description="Toggle the filter on or off")
 @is_guild_owner()
@@ -185,6 +185,24 @@ async def gamble(interaction: discord.Interaction, amount: int):
         await bot.db.commit()
 
     await cursor.close()
+
+@bot.tree.command(name="donate", description="donate your rice")
+async def donate(interaction: discord.Interaction, user: discord.Member, amount: int):
+    cursor = await bot.db.cursor()
+    await cursor.execute("SELECT rice FROM users WHERE user_id = ?", (user.id,))
+    res = await cursor.fetchone()
+    if res is None:
+        await interaction.response.send_message(f"{user.name} is not registered in the DB")
+    await cursor.execute("SELECT rice FROM users WHERE user_id = ?", (interaction.user.id,))
+    res = await cursor.fetchone()
+    if res is None:
+        await interaction.response.send_message(f"{interaction.user.mention} is not registered in the DB")
+
+    await cursor.execute(f"UPDATE users SET rice = rice - {amount} WHERE user_id = ?", (interaction.user.id,))
+    await cursor.execute(f"UPDATE users SET rice = rice + {amount} WHERE user_id = ?", (user.id,))
+    await bot.db.commit()
+    await cursor.close()
+    await interaction.response.send_message(f"{interaction.user.mention} donated {amount} rice to {user.mention}")
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
 asyncio.run(bot.db.close())
