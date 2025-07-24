@@ -202,6 +202,9 @@ async def donate(interaction: discord.Interaction, user: discord.Member, amount:
     if amount > res[0]:
         await interaction.response.send_message("you do not have enough rice to donate")
         return
+    if amount <= 0:
+        await interaction.response.send_message("you cannot donate 0 or negative rice")
+        return
 
     await cursor.execute(f"UPDATE users SET rice = rice - {amount} WHERE user_id = ?", (interaction.user.id,))
     await cursor.execute(f"UPDATE users SET rice = rice + {amount} WHERE user_id = ?", (user.id,))
