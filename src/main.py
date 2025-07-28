@@ -47,7 +47,7 @@ async def on_ready():
     except Exception as e:
         print(e)
 
-    await bot.get_channel(1290759844797612042).send(f"<@&{1295377234508644352}> OPEN YOUR GIFTS <:angry:1399203078728581141><:angry:1399203078728581141><:angry:1399203078728581141>")
+    # await bot.get_channel(1290759844797612042).send(f"<@&{1295377234508644352}> OPEN YOUR GIFTS <:angry:1399203078728581141><:angry:1399203078728581141><:angry:1399203078728581141>")
 
     print("Setup Complete.")
 
@@ -121,8 +121,9 @@ async def filter_error(interaction: discord.Interaction, error):
         await interaction.response.send_message("You do not have permission to use this command.", ephemeral=True)
 
 @bot.tree.command(name="announce", description="send a message")
-async def announce(interaction: discord.Interaction, role: discord.Role, *, message: str):
-    pass
+async def announce(interaction: discord.Interaction, channel: discord.TextChannel, ping: discord.Role | discord.User, *, message: str):
+    await bot.get_channel(channel.id).send(f"{ping.mention} {message}")
+    await interaction.response.send_message("message successful", ephemeral=True)
 
 @bot.tree.command(name="daily", description="Claim your daily rations")
 @app_commands.checks.cooldown(1, 86400, key=lambda i: (i.guild_id, i.user.id))
