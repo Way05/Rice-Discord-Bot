@@ -121,8 +121,11 @@ async def filter_error(interaction: discord.Interaction, error):
         await interaction.response.send_message("You do not have permission to use this command.", ephemeral=True)
 
 @bot.tree.command(name="announce", description="send a message")
-async def announce(interaction: discord.Interaction, channel: discord.TextChannel, ping: discord.Role | discord.User, *, message: str):
-    await bot.get_channel(channel.id).send(f"{ping.mention} {message}")
+async def announce(interaction: discord.Interaction, channel: discord.TextChannel, ping: discord.Role | discord.User = None, *, message: str):
+    if not ping:
+        await bot.get_channel(channel.id).send(message)
+    else:
+        await bot.get_channel(channel.id).send(f"{ping.mention} {message}")
     await interaction.response.send_message("message successful", ephemeral=True)
 
 @bot.tree.command(name="daily", description="Claim your daily rations")
