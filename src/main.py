@@ -185,7 +185,7 @@ async def gamble(interaction: discord.Interaction, amount: int):
         roll = random.randint(1, 10)
         money -= amount
         if roll == 1:
-            win = round(amount * 1.5 * random.randint(1, 5))
+            win = round(amount * 5 * random.randint(1, 5))
             money += win
             await interaction.response.send_message(f"You gambled {amount} rice and won {win} rice! You now have {money} rice.")
         else:
