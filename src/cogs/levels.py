@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands, tasks
 
 sessionLevelData = {}
@@ -15,8 +16,8 @@ async def loadLevelData(bot):
 def getXPToNextLevel(level):
     return round(100 * level ** 1.5)
 
-def addXP(message):
-    sessionLevelData[message.author.id]["xp"] += len(message.content)
+def addXP(user, value):
+    sessionLevelData[user.id]["xp"] += value
     
 async def checkIfLevelUp(message):
     currXP = sessionLevelData[message.author.id]["xp"]
@@ -48,9 +49,19 @@ class Levels(commands.Cog):
         await self.bot.wait_until_ready()
 
     @commands.Cog.listener()
-    async def on_message(self, message):
-        addXP(message)
+    async def on_message(self, message: discord.Message):
+        addXP(message.author.id, len(message.content))
         await checkIfLevelUp(message)
+
+        ctx = await self.bot.get_context(message)
+        if ctx.valid:
+            self.bot.process_commands(message)
+            addXP(message.author.id, 50)
+
+    @commands.Cog.listener()
+    async def on_disconnect(self):
+        self.saveLevels().close()
+        self.saveLevels()
         
 async def setup(bot):
     await bot.add_cog(Levels(bot))
