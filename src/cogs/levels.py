@@ -71,7 +71,7 @@ class Levels(commands.Cog):
     @commands.Cog.listener()
     async def on_disconnect(self):
         self.saveLevels().close()
-        self.saveLevels()
+        await self.saveLevels()
         
 async def setup(bot):
     await bot.add_cog(Levels(bot))
