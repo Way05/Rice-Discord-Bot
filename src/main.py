@@ -78,7 +78,7 @@ def is_guild_owner():
     return app_commands.check(predicate)
 
 @bot.event
-async def on_message(message):
+async def on_message(message: discord.Message):
     if message.author == bot.user:
         return
     
