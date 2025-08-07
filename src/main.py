@@ -47,7 +47,7 @@ async def on_ready():
     except Exception as e:
         print(e)
 
-    # await bot.get_channel(1290759844797612042).send(f"<@&{1295377234508644352}> OPEN YOUR GIFTS <:angry:1399203078728581141><:angry:1399203078728581141><:angry:1399203078728581141>")
+    await bot.get_channel(1048428980128198680).send("<:rice_spin:1391523995916046490>")
 
     print("Setup Complete.")
 
