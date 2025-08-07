@@ -16,8 +16,8 @@ async def loadLevelData(bot):
 def getXPToNextLevel(level):
     return round(100 * level ** 1.5)
 
-def addXP(user, value):
-    sessionLevelData[user.id]["xp"] += value
+def addXP(userID, value):
+    sessionLevelData[userID]["xp"] += value
     
 async def checkIfLevelUp(message):
     currXP = sessionLevelData[message.author.id]["xp"]
