@@ -1,4 +1,5 @@
 import discord
+from discord import app_commands
 from discord.ext import commands, tasks
 
 sessionLevelData = {}
@@ -33,6 +34,16 @@ class Levels(commands.Cog):
         self.bot = bot
         self.saveLevels.start()
 
+    @app_commands.command(name="level", description="Check your level")
+    async def getLevel(self, interaction: discord.Interaction):
+        userData = sessionLevelData[interaction.user.id]
+        if userData is None:
+            await interaction.response.send_message("Please register your user using ```/register``` before checking your level.")
+        else:
+            level = userData["level"]
+            xp = userData["xp"]
+            await interaction.response.send_message(f"{interaction.user.mention}, you are level {level} [{getXPToNextLevel(level) - xp} XP to next level]")
+
     @tasks.loop(minutes=5)
     async def saveLevels(self):
         cursor = await self.bot.db.cursor()
@@ -55,7 +66,6 @@ class Levels(commands.Cog):
 
         ctx = await self.bot.get_context(message)
         if ctx.valid:
-            self.bot.process_commands(message)
             addXP(message.author.id, 50)
 
     @commands.Cog.listener()
