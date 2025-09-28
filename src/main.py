@@ -47,7 +47,7 @@ async def on_ready():
     except Exception as e:
         print(e)
 
-    await bot.get_channel(1048428980128198680).send("<:rice_spin:1391523995916046490>")
+    await bot.get_channel(1048428980128198680).send("<:ri:1421658076993421383>")
 
     print("Setup Complete.")
 
@@ -65,7 +65,8 @@ responses = [
     "<:stare:1343032007277412424>",
     "<:look:1386023536300396594>",
     "<:tweaking:1386075748741157055>",
-    "<:rice_spin:1391523995916046490>"
+    "<:rice_spin:1391523995916046490>",
+    "<:ri:1421658076993421383>"
 ]
 
 filter_enabled = False
