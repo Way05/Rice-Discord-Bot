@@ -13,6 +13,7 @@ token = os.getenv("DISCORD_TOKEN")
 GUILD_ID = discord.Object(id=1048428980128198677)
 GUILD_NONE = None
 BOT_ROLE = 1353587896497475678
+A_ROLE = 1277078129793437716
 
 handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
 intents = discord.Intents.default()
@@ -47,7 +48,7 @@ async def on_ready():
     except Exception as e:
         print(e)
 
-    await bot.get_channel(1048428980128198680).send("<:ri:1421658076993421383>")
+    await bot.get_channel(1048428980128198680).send(f"<@&{A_ROLE}> <:ri:1421658076993421383>")
 
     print("Setup Complete.")
 
