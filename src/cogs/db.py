@@ -78,7 +78,7 @@ async def setup(bot):
     print("Loading database...")
     bot.db = await aiosqlite.connect("main.db")
     cursor = await bot.db.cursor()
-    await cursor.execute("CREATE TABLE IF NOT EXISTS users(user_id INTEGER PRIMARY KEY, rice INTEGER DEFAULT 5000, level INTEGER DEFAULT 0, xp INTEGER DEFAULT 0)")
+    await cursor.execute("CREATE TABLE IF NOT EXISTS users(user_id INTEGER PRIMARY KEY, rice INTEGER DEFAULT 10000, level INTEGER DEFAULT 0, xp INTEGER DEFAULT 0)")
     await bot.db.commit()
     await cursor.close()
     print("Database loaded.")
