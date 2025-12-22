@@ -92,9 +92,9 @@ async def on_message(message: discord.Message):
         # message.delete()
         # await message.channel.send(f"{message.author.mention} yu can not say that <:stare:1343032007277412424>")
     if filter_enabled:
-        await message.delete()
         for word in censored:
             if word in message.content.lower():
+                await message.delete()
                 await message.channel.send(f"{message.author.mention} yu cannot say {word} <:stare:1343032007277412424>")
                 return
 
