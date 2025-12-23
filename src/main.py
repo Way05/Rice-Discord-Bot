@@ -48,7 +48,7 @@ async def on_ready():
     except Exception as e:
         print(e)
 
-    await bot.get_channel(1048428980128198680).send(f"<@&{A_ROLE}> <:ri:1421658076993421383>")
+    await bot.get_channel(1048428980128198680).send("<:ri:1421658076993421383>")
 
     print("Setup Complete.")
 
@@ -130,25 +130,6 @@ async def announce(interaction: discord.Interaction, channel: discord.TextChanne
         await bot.get_channel(channel.id).send(f"{ping.mention} {message}")
     await interaction.response.send_message("message successful", ephemeral=True)
 
-@bot.tree.command(name="daily", description="Claim your daily rations")
-@app_commands.checks.cooldown(1, 86400, key=lambda i: (i.guild_id, i.user.id))
-async def daily(interaction: discord.Interaction):
-    cursor = await bot.db.cursor()
-    await cursor.execute("SELECT EXISTS(SELECT 1 FROM users WHERE user_id = ?)", (interaction.user.id,))
-    res = await cursor.fetchone()
-    if res[0] == 0:
-        await interaction.response.send_message("Please register your user using ```/register``` first.")
-    else:
-        await cursor.execute("UPDATE users SET rice = rice + 2500 WHERE user_id = ?", (interaction.user.id,))
-        await bot.db.commit()
-        await interaction.response.send_message(f"{interaction.user.mention} claimed their daily 2500 rice!")
-    await cursor.close()
-
-@daily.error
-async def daily_error(interaction: discord.Interaction, error):
-    if isinstance(error, app_commands.CommandOnCooldown):
-        await interaction.response.send_message(f"You can only claim your daily rations once every 24 hours. Try again in {error.retry_after:.0f} seconds.", ephemeral=True)
-
 @bot.tree.command(name="bonk", description="Bonk a user")
 @app_commands.describe(user="The user to bonk")
 async def bonk(interaction: discord.Interaction, user: discord.Member):
@@ -169,60 +150,6 @@ async def bonk(interaction: discord.Interaction, user: discord.Member):
     await bot.db.commit()
     await cursor.close()
     await interaction.response.send_message(f"{interaction.user.mention} bonked {user.mention} and stole {riceToSteal} of their rice. <:look:1386023536300396594>")
-
-@bot.tree.command(name="gamble", description="Gamble with your rice")
-async def gamble(interaction: discord.Interaction, amount: int):
-    cursor = await bot.db.cursor()
-    await cursor.execute("SELECT rice FROM users WHERE user_id = ?", (interaction.user.id,))
-    res = await cursor.fetchone()
-    if res is None:
-        await interaction.response.send_message("Please register your user using ```/register``` before gambling.")
-    money = res[0]
-    
-    if amount > money:
-        await interaction.response.send_message(f"You don't have enough rice to gamble {amount} rice.")
-    elif amount <= 0:
-        await interaction.response.send_message(f"You cannot gamble {amount} rice.")
-    else:
-        roll = random.randint(1, 10)
-        money -= amount
-        if roll == 1:
-            win = round(amount * 5 * random.randint(1, 5))
-            money += win
-            await interaction.response.send_message(f"You gambled {amount} rice and won {win} rice! You now have {money} rice.")
-        else:
-            await interaction.response.send_message(f"You lost {amount} rice. You now have {money} rice left.")
-
-        await cursor.execute("UPDATE users SET rice = ? WHERE user_id = ?", (money, interaction.user.id))
-        await bot.db.commit()
-
-    await cursor.close()
-
-@bot.tree.command(name="donate", description="donate your rice")
-async def donate(interaction: discord.Interaction, user: discord.Member, amount: int):
-    cursor = await bot.db.cursor()
-    await cursor.execute("SELECT rice FROM users WHERE user_id = ?", (user.id,))
-    res = await cursor.fetchone()
-    if res is None:
-        await interaction.response.send_message(f"{user.name} is not registered in the DB")
-        return
-    await cursor.execute("SELECT rice FROM users WHERE user_id = ?", (interaction.user.id,))
-    res = await cursor.fetchone()
-    if res is None:
-        await interaction.response.send_message(f"{interaction.user.mention} is not registered in the DB")
-        return
-    if amount > res[0]:
-        await interaction.response.send_message("you do not have enough rice to donate")
-        return
-    if amount <= 0:
-        await interaction.response.send_message("you cannot donate 0 or negative rice")
-        return
-
-    await cursor.execute(f"UPDATE users SET rice = rice - {amount} WHERE user_id = ?", (interaction.user.id,))
-    await cursor.execute(f"UPDATE users SET rice = rice + {amount} WHERE user_id = ?", (user.id,))
-    await bot.db.commit()
-    await cursor.close()
-    await interaction.response.send_message(f"{interaction.user.mention} donated {amount} rice to {user.mention}")
 
 bot.run(token, log_handler=handler, log_level=logging.DEBUG)
 asyncio.run(bot.db.close())
