@@ -13,6 +13,7 @@ async def loadLevelData(bot):
             "level": data[1],
             "xp": data[2]
         }
+    await cursor.close()
 
 def getXPToNextLevel(level):
     return round(100 * level ** 1.5)

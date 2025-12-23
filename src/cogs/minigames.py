@@ -22,10 +22,10 @@ class Minigames(commands.Cog):
             if res is not None:
                 await cursor.execute("UPDATE users SET rice = rice + 10000 WHERE user_id = ?", (interaction.user.id,))
                 await self.bot.db.commit()
-                await cursor.close()
             await interaction.followup.send(f"Correct! The number was {number}.")
         else:
             await interaction.followup.send(f"you suck. it was {number}. gamble again")
+        await cursor.close()
 
     @app_commands.command(name="rps", description="Play rock paper scissors")
     @app_commands.describe(choice="Your choice: rock, paper, or scissors")

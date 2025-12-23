@@ -19,6 +19,7 @@ class DB(commands.Cog):
 
         await cursor.execute("INSERT INTO users(user_id) VALUES(?)", (interaction.user.id,))
         await self.bot.db.commit()
+        await cursor.close()
         await interaction.response.send_message(f"{interaction.user.mention} has been registered in the database.")
 
     @app_commands.command(name="rice", description="Check your rice balance")
@@ -31,7 +32,8 @@ class DB(commands.Cog):
         else:
             rice_amount = res[0]
             await interaction.response.send_message(f"{interaction.user.mention}, you have {rice_amount} rice.")
-
+        await cursor.close()
+        
     # @app_commands.command(name="level", description="Check your level")
     # async def getLevel(self, interaction: discord.Interaction):
     #     cursor = await self.bot.db.cursor()
