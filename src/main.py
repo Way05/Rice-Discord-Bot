@@ -142,7 +142,7 @@ async def bonk(interaction: discord.Interaction, user: discord.Member):
     riceToSteal = 100
     if res[0] < riceToSteal and res[0] > 0:
         riceToSteal = res[0]
-    elif res[0] == 0:
+    elif res[0] <= 0:
         await interaction.response.send_message(f"{interaction.user.mention} bonked {user.mention}, but they had no rice to steal <:look:1386023536300396594>")
 
     await cursor.execute(f"UPDATE users SET rice = rice - {riceToSteal} WHERE user_id = ?", (user.id,))
